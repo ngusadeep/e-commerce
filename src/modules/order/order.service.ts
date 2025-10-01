@@ -68,6 +68,13 @@ export class OrderService {
     await this.orderRepository.save(order);
     return 'Order updated successfully';
   }
+  async findAll(): Promise<Order[]> {
+    return await this.orderRepository.find({
+      relations: { products: true },
+      select: { products: { product_id: true } },
+    });
+  }
+
   async findOne(id: string): Promise<Order | null> {
     return await this.orderRepository.findOne({
       where: { order_id: id },

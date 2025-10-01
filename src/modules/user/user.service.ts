@@ -81,4 +81,20 @@ export class UserService {
     await this.userRepository.softDelete({ user_id: id });
     return 'User Deleted Successfully';
   }
+  async findOneUserOrders(id: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { user_id: id },
+      relations: { orders: { products: true } },
+      select: {
+        user_id: true,
+        name: true,
+        orders: {
+          order_id: true,
+          ordered_on: true,
+          total: true,
+          products: { product_id: true, name: true, price: true },
+        },
+      },
+    });
+  }
 }

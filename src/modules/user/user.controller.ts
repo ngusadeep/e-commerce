@@ -36,4 +36,8 @@ export class UserController {
   async remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }
+  @Get('userorders/:id')
+  async findOneUserOrders(@Param('id') id: string) {
+    return this.userService.findOneUserOrders(id);
+  }
 }

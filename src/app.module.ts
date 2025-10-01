@@ -10,6 +10,8 @@ import { Product } from './modules/product/entities/product.entity';
 import { Category } from './modules/category/entities/category.entity';
 import { Order } from './modules/order/entities/order.entity';
 import { Profile } from './modules/user/entities/profile.entity';
+import { CategoryModule } from './modules/category/category.module';
+import { OrderModule } from './modules/order/order.module';
 @Module({
   imports: [
     AppConfigModule,
@@ -29,6 +31,8 @@ import { Profile } from './modules/user/entities/profile.entity';
     }),
     ProductModule,
     UserModule,
+    CategoryModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

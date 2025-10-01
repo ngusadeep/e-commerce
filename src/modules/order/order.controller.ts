@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
 } from '@nestjs/common';
@@ -18,5 +18,24 @@ export class OrderController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(createOrderDto);
+  }
+  @Put()
+  async update(@Body() updateOrderDto: UpdateOrderDto) {
+    return this.orderService.update(updateOrderDto);
+  }
+
+  @Get()
+  async findAll() {
+    return this.orderService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.orderService.findOne(id);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.orderService.remove(id);
   }
 }
