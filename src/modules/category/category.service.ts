@@ -53,6 +53,6 @@ export class CategoryService {
       return 'Category not found';
     }
     await this.categoryRepository.softDelete({ category_id: id });
-    return 'Category deleted succesfully';
+    return 'Category deleted succesfully!';
   }
 }
