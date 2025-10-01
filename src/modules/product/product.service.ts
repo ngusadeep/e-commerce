@@ -19,6 +19,7 @@ export class ProductService {
     newProduct.price = createProductDto.price;
     return await this.productRepo.save(newProduct);
   }
+
   async findAll(): Promise<Product[]> {
     return await this.productRepo.find();
   }

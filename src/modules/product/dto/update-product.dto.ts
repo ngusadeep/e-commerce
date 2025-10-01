@@ -3,4 +3,7 @@ import { CreateProductDto } from './create-product.dto';
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {
   id: string;
+  name: string;
+  description: string;
+  price: number;
 }
