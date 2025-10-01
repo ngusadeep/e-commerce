@@ -1,26 +1,88 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Order } from './entities/order.entity';
+import { UserService } from '../user/user.service';
+import { ProductService } from '../product/product.service';
+import { Product } from '../product/entities/product.entity';
 @Injectable()
 export class OrderService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    private readonly userService: UserService,
+    private readonly productService: ProductService,
+  ) {}
+  async create(createOrderDto: CreateOrderDto): Promise<string> {
+    // Fetch the user to associat with the order
+    const user = await this.userService.findOne(createOrderDto.userId);
+    if (!user) {
+      return 'User not found';
+    }
+
+    const order = new Order(); // Create a new order instance
+    order.user = user;
+    let total: number = 0;
+    // Fetch and process each product
+    const products = (
+      await Promise.all(
+        createOrderDto.productIds.map(async (productId) => {
+          const product = await this.productService.findOne(productId);
+          if (product) {
+            total += parseInt(product.price + '');
+            return product;
+          }
+        }),
+      )
+    ).filter((p): p is Product => p !== undefined); // ✅ <-- fixes the type
+
+    order.products = products; // set products to order
+    order.total = total;
+    order.ordered_on = new Date();
+    await this.orderRepository.save(order); // Save the new order to the repository
+    return 'Ordered successfully';
+  }
+  async update(updateOrderDto: UpdateOrderDto): Promise<string> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: updateOrderDto.orderId },
+      relations: { products: true },
+    });
+    let total: number = 0;
+    const new_products = (
+      await Promise.all(
+        updateOrderDto.productIds.map(async (productId) => {
+          const product = await this.productService.findOne(productId);
+          if (product) {
+            total += parseInt(product.price + '');
+            return product;
+          }
+        }),
+      )
+    ).filter((p): p is Product => p !== undefined);
+
+    if (!order) return 'Order not exists!';
+    order.products = new_products;
+    order.total = total;
+    await this.orderRepository.save(order);
+    return 'Order updated successfully';
+  }
+  async findOne(id: string): Promise<Order | null> {
+    return await this.orderRepository.findOne({
+      where: { order_id: id },
+      select: {
+        user: {
+          user_id: true,
+          name: true,
+          profile: { profile_id: true, address: true },
+        },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all order`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async remove(id: string): Promise<string> {
+    await this.orderRepository.softDelete(id);
+    return 'Order deleted succesfully';
   }
 }
