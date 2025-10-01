@@ -17,7 +17,7 @@ export class Category {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string;
+  description?: string;
 
   @CreateDateColumn()
   created_on: Date;
