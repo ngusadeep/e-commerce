@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WinstonLogger } from './config/winston.logger';
-
+import { ValidationPipe } from '@nestjs/common';
 dotenv.config({ path: process.cwd() + `/.env.${process.env.NODE_ENV}` });
 //                                OR
 // dotenv.config({ path: process.cwd() + `/${process.env.NODE_ENV}.env` });
@@ -14,6 +14,7 @@ dotenv.config({ path: process.cwd() + `/.env.${process.env.NODE_ENV}` });
  if you are using normal .env file, the above import and config steps are not required.
 */ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe()); // Applies validation globally
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port') ?? 4000;
 

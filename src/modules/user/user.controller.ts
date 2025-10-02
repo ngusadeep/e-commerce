@@ -6,15 +6,20 @@ import {
   Param,
   Put,
   Delete,
+  UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ValidationPipe } from '@nestjs/common';
+import { ParseUUIDPipe } from './../../config/custom/parse-uuid.pipe';
+
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @UsePipes(new ValidationPipe())
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.userService.create(createUserDto);
   }
@@ -25,7 +30,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.findOne(id);
   }
   @Put()
@@ -33,11 +38,11 @@ export class UserController {
     return await this.userService.update(updateUserDto);
   }
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.remove(id);
   }
   @Get('userorders/:id')
-  async findOneUserOrders(@Param('id') id: string) {
+  async findOneUserOrders(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.findOneUserOrders(id);
   }
 }
