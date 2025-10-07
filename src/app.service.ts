@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import configuration from 'src/config/configuration';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
+  constructor(private readonly configService: ConfigService) {}
   welcome(): string {
-    const appName: string | undefined = configuration().app.name;
-    return `Welcome to ${appName}`;
+    return `This is Backend Api`;
+  }
+  getHello(): string {
+    return `Application Name from Custom configurations: ${this.configService.get<string>('app.name')}`;
   }
 }

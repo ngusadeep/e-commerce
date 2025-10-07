@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Profile } from './entities/profile.entity';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
   constructor(
@@ -15,27 +15,37 @@ export class UserService {
     private profileRepository: Repository<Profile>,
   ) {}
 
+  private async hashString(str: string): Promise<string> {
+    const saltRounds = 10; // Define the cost factor for hashing
+    return await bcrypt.hash(str, saltRounds);
+  }
+
   async create(createUserDto: CreateUserDto) {
-    // Create a new User instance
+    // Prevent duplicate emails
+    const existing = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+      select: { user_id: true },
+    });
+    if (existing) {
+      throw new ConflictException('Email already in use');
+    }
+
+    // Create and save the user
     const user = new User();
     user.name = createUserDto.name;
-    user.password = createUserDto.password;
+    user.password = await this.hashString(createUserDto.password); // encrypt password before insert
     user.email = createUserDto.email;
-    /*
-     * Save the new user to the repository.
-     * We used the `save` method instead of `insert`. The `save` method will return the User object after insertion or update, unlike `insert`.
-     */
     const new_user = await this.userRepository.save(user);
 
-    // Create a new Profile instance for the user
+    // Create and save the profile linked to the saved user
     const profile = new Profile();
     profile.address = createUserDto.address;
     profile.phone_number = createUserDto.phoneno;
     profile.dob = createUserDto.dob;
     profile.bio = createUserDto.bio;
-    profile.user = new_user; // we can use {user_id:new_user.user_id } as User;
-    await this.profileRepository.insert(profile);
-    // Save the profile and assign it to the user
+    profile.user = new_user;
+    await this.profileRepository.save(profile);
+
     return { message: 'User Created Successfully', user_Id: new_user.user_id };
   }
   async findAll(): Promise<User[]> {
@@ -94,6 +104,21 @@ export class UserService {
           total: true,
           products: { product_id: true, name: true, price: true },
         },
+      },
+    });
+  }
+
+  /* other methods */
+  async findByEmail(email: string) {
+    return await this.userRepository.findOne({
+      where: { email: email },
+      // Include email so callers (LocalStrategy / AuthController) can access it
+      select: {
+        user_id: true,
+        name: true,
+        email: true,
+        password: true,
+        role: true,
       },
     });
   }

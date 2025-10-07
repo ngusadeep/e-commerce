@@ -11,6 +11,13 @@ import {
 } from 'typeorm';
 import { Profile } from './profile.entity';
 import { Order } from 'src/modules/order/entities/order.entity';
+
+export enum RoleEnum {
+  ADMIN = 'ADMIN',
+  SELLER = 'SELLER',
+  CONSUMER = 'CONSUMER',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -39,4 +46,11 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
+
+  @Column({
+    type: 'enum',
+    enum: RoleEnum,
+    default: RoleEnum.CONSUMER,
+  })
+  role: RoleEnum;
 }

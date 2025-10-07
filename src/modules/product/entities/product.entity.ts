@@ -20,7 +20,13 @@ export class Product {
 
   @Column()
   description: string;
-  @Column({ type: 'decimal' })
+  @Column({
+    type: 'decimal',
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+  })
   price: number;
   @CreateDateColumn()
   createdon: Date;

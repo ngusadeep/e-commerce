@@ -20,6 +20,7 @@ export class Order {
   order_id: string;
 
   @Column()
+  @Column({ type: 'decimal' })
   total: number;
 
   @Column()
