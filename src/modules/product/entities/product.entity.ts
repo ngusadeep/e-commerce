@@ -9,8 +9,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Order } from './../../order/entities/order.entity';
-import { Category } from './../../category/entities/category.entity';
+import type { Order } from './../../order/entities/order.entity';
+import type { Category } from './../../category/entities/category.entity';
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn('uuid')
@@ -36,10 +36,10 @@ export class Product {
 
   @DeleteDateColumn()
   deletedon: Date;
-  @ManyToMany(() => Order, (order) => order.products)
+  @ManyToMany('Order', (order: Order) => order.products)
   orders: Order[];
 
-  @ManyToOne(() => Category, (category) => category.products)
+  @ManyToOne('Category', (category: Category) => category.products)
   @JoinColumn({ name: 'category_id' })
   category: Category;
 }

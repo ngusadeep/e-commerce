@@ -11,8 +11,8 @@ import {
   JoinTable,
 } from 'typeorm';
 
-import { User } from './../../user/entities/user.entity';
-import { Product } from './../../product/entities/product.entity';
+import type { User } from './../../user/entities/user.entity';
+import type { Product } from './../../product/entities/product.entity';
 
 @Entity()
 export class Order {
@@ -35,11 +35,11 @@ export class Order {
   @DeleteDateColumn({ nullable: true })
   deleted_on: Date;
 
-  @ManyToOne(() => User, (user) => user.orders)
+  @ManyToOne('User', (user: User) => user.orders)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToMany(() => Product, (product) => product.orders)
+  @ManyToMany('Product', (product: Product) => product.orders)
   @JoinTable({ name: 'order_products' })
   products: Product[];
 }

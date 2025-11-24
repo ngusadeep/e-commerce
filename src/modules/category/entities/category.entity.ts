@@ -7,7 +7,7 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Product } from './../../product/entities/product.entity';
+import type { Product } from './../../product/entities/product.entity';
 @Entity()
 export class Category {
   @PrimaryGeneratedColumn('uuid')
@@ -26,6 +26,6 @@ export class Category {
   updated_on: Date;
   @DeleteDateColumn({ nullable: true })
   deleted_on: Date;
-  @OneToMany(() => Product, (product) => product.category)
+  @OneToMany('Product', (product: Product) => product.category)
   products: Product[];
 }

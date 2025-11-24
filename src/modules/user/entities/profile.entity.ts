@@ -1,4 +1,4 @@
-import { User } from './user.entity';
+import type { User } from './user.entity';
 import {
   Entity,
   Column,
@@ -37,7 +37,7 @@ export class Profile {
 
   @DeleteDateColumn({ nullable: true })
   deleted_on: Date;
-  @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
+  @OneToOne('User', (user: User) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

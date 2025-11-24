@@ -9,8 +9,8 @@ import {
   DeleteDateColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Profile } from './profile.entity';
-import { Order } from 'src/modules/order/entities/order.entity';
+import type { Profile } from './profile.entity';
+import type { Order } from 'src/modules/order/entities/order.entity';
 
 export enum RoleEnum {
   ADMIN = 'ADMIN',
@@ -41,10 +41,10 @@ export class User {
 
   @DeleteDateColumn({ nullable: true })
   deleted_on: Date;
-  @OneToOne(() => Profile, (profile) => profile.user)
+  @OneToOne('Profile', (profile: Profile) => profile.user)
   profile: Profile;
 
-  @OneToMany(() => Order, (order) => order.user)
+  @OneToMany('Order', (order: Order) => order.user)
   orders: Order[];
 
   @Column({
