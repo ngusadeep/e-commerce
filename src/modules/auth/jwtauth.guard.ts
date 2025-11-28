@@ -23,6 +23,7 @@ export class AuthGuard implements CanActivate {
     if (skipGuard) {
       return true;
     }
+
     const request: Request = context.switchToHttp().getRequest();
     const token = request.cookies?.access_token;
 
